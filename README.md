@@ -4,6 +4,7 @@
 
 - [Overview](#overview)
 - [Traits](#traits)
+- [Running the code and the tests](#running-the-code-and-the-tests)
 - [To Do](#to-do)
 
 ## Overview
@@ -94,6 +95,52 @@ Adding this trait allows us to perform actions that require copying such as:
 ```rust
     result.push(v[i])
 ```
+
+Luckily integers (which is all we use here) already implement both the
+`PartialOrd` and the `Copy` traits, so we're good to go. If we needed to
+sort something more complex (like an array of student records), then we'd
+have to decide
+
+- How to implement the `PartialOrd` trait, perhaps by sorting by ID
+  numbers, or we could be brave and attempt some sort of sorting by
+  name.
+- If and how we are willing to implement the `Copy` trait. As a rule
+  we probably don't want to copy entire student records, so we'd have
+  to figure out what makes sense in our particular situation.
+
+## Running the code and the tests
+
+This is set up so that running the program (with `cargo run`) will run and
+time all three sorting algorithms on a randomly generated array of integers.
+Since insertion sort is O(N^2) and the other two are O(N log N), we would
+expect them to be faster. We might also expect quicksort to be faster (by
+a constant factor) than merge sort since quicksort doesn't need to copy
+elements around. Feel free to increase the value of the `size` constant
+at the top of the code to see how that affects the timing.
+
+Use `cargo test` to run the tests "by hand". The insertion sort tests
+should pass without you having to do anything. Some of the quicksort
+and merge sort tests may pass initially "for free" even though you know
+you haven't actually implemented anything. This is just because the
+default "silly" things that we do for those happen to be correct for
+things like empty lists of values.
+
+When running either the program or the tests, you'll initially get a
+warning like:
+
+```text
+warning: unused variable: `ys`
+   --> src/main.rs:171:75
+    |
+171 | fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Vec<T>) -> Vec<T> {
+    |                                                                           ^^ help: if this is intentional, prefix it with an underscore: `_ys`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+```
+
+This is just telling you that the stub code that we provided doesn't use the
+parameter `ys`. As you properly implement `merge()` you'll presumably use
+both arguments and this warning will go away.
 
 ## To Do
 
