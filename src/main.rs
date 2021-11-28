@@ -19,13 +19,13 @@ fn main() {
 
     let before_merged = Instant::now();
     let merged_v = merge_sort(&v);
-    println!("Elapsed time for mergesort was {:?}.", before_merged.elapsed());
+    println!("Elapsed time for merge sort was {:?}.", before_merged.elapsed());
     // println!("{:?}", v);
     // println!("{:?}", merged_v);
     println!("Is the original, random list in order?: {:?}", is_sorted(&v));
     println!("Was insertion sort in order?: {:?}", is_sorted(&u));
     println!("Was quicksort in order?: {:?}", is_sorted(&w));
-    println!("Was mergesort in order?: {:?}", is_sorted(&merged_v));
+    println!("Was merge sort in order?: {:?}", is_sorted(&merged_v));
 }
 
 // Insertion sort is "in place", so we modify the input array v
@@ -35,6 +35,9 @@ fn main() {
 // and slices of the array for debugging purposes with `{:?}`. I
 // don't do that here, but you could add some print statements if,
 // for example, you want to watch the bubbling happen.
+//
+// Note that the parameter v *has* to be mutable because we're 
+// modifying it in place.
 fn insertion_sort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     // Goal: (All x, y | 0 ≤ x < y < length : v[x] ≤ v[y])
     for i in 0..v.len() {
@@ -72,6 +75,9 @@ fn insertion_sort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
 // and slices of the array for debugging purposes with `{:?}`. I
 // don't do that here, but you could add some print statements if,
 // for example, you want to watch the sorting happen.
+//
+// Note that the parameter v *has* to be mutable because we're 
+// modifying it in place.
 fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     // Quicksort is a recursive solution where we select a pivot
     // value (usually just the first element) and split (in place)
@@ -108,7 +114,7 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     quicksort(&mut v[smaller+1..length]);
 }
 
-// Mergesort can't be done "in place", so it needs to return a _new_
+// Merge sort can't be done "in place", so it needs to return a _new_
 // Vec<T> of the sorted elements. The array elements need to have
 // the traits `PartialOrd` and `Debug` like in the other sorting
 // algorithms, but they also need to have the `Copy` trait so we
@@ -119,8 +125,16 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
 // Note, however, that this has significant consequences – we can use `merge_sort`
 // to sort things like numbers, but sorting "large" things (e.g., student records)
 // would involve copying them, and that's likely to be expensive and perhaps undesirable.
+//
+// Note that here the parameter v does *not* have to be mutable because we're 
+// creating and returning a new vector instead of modifying v in place.
+// We're returning a vector instead of an array here because arrays have to
+// know exactly how big they are. I suspect there's a way to make that work
+// but I (Nic) couldn't figure out an easy way to sort out the types on the
+// `merge()` function keeping everything as arrays. It was a lot easier to 
+// just have the return type be Vec, so that's what I did. 
 fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> Vec<T> {
-    // Mergesort is a recursive solution where we split the
+    // Merge sort is a recursive solution where we split the
     // array in half (slices make this easy), sort each half,
     // and then merge the results together. All the "interesting"
     // work is in the merge here, where in quicksort the "interesting"
@@ -142,6 +156,10 @@ fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> V
     return result
 }
 
+// "Out of the box" there's a warning here about `ys` being
+// unused. Presumably you'll actually use `ys` in your solution,
+// so that warning should go away. You can remove this comment
+// if you wish since it won't be relevant any longer.
 fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Vec<T>) -> Vec<T> {
     // This takes two sorted vectors, like:
     //    <5, 8, 9> and
@@ -243,7 +261,7 @@ mod tests {
         }
     }
 
-    mod mergesort {
+    mod merge_sort {
         use super::*;
         #[test]
         fn empty() {
