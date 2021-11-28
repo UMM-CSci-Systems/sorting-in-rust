@@ -2,7 +2,11 @@ use rand::{thread_rng, Rng};
 use std::time::{Instant};
 
 fn main() {
-    let size = 750000; // 100000;
+    // Feel free to raise size if you want to see the timing difference
+    // between the different algorithms. Since insertion sort is O(N^2)
+    // and the other two are O(N log N), you should definitely be able
+    // to see a difference between it and the two faster algorithms.
+    let size = 1000; // 100000;
     let v = generate_random_array(size, 0, size);
 
     let mut u = v.clone();
@@ -60,7 +64,7 @@ fn insertion_sort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
             // Since j-1 and j are out of order swap them, and move
             // j one to the left to continue the bubbling if necessary.
             v.swap(j-1, j);
-            j = j - 1;
+            j -= 1;
         }
     }
     // And we're done! The outer for loop is done O(N) times, and
@@ -104,7 +108,7 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     
     // ...
 
-    let smaller = 99999999; // Totally wrong – you should fix this.
+    let smaller = 0; // Totally wrong – you should fix this.
 
     // Sort all the items < pivot
     quicksort(&mut v[0..smaller]);
@@ -152,8 +156,12 @@ fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> V
     let middle = v.len() / 2; //rounds down by default
     let left = merge_sort(&v[0..middle]);
     let right = merge_sort(&v[middle .. len]);
-    let result = merge(left, right);
-    return result
+    // Note that in Rust the last expression is what is
+    // returned, and we don't need the explicit `return`
+    // keyword. So this merges `left` and `right` and
+    // returns the result as the result of this call to
+    // `merge_sort()`.
+    merge(left, right)
 }
 
 // "Out of the box" there's a warning here about `ys` being
@@ -176,7 +184,7 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
 
     // This is totally wrong and will not sort. You should replace it
     // with something useful. :)
-    return xs;
+    xs
 }
 
 fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
@@ -186,7 +194,7 @@ fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
             return false;
         }
     }
-    return true;
+    true
 }
 
 fn generate_random_array(len: i32, min: i32, max:i32) -> Vec<i32> {
@@ -195,7 +203,9 @@ fn generate_random_array(len: i32, min: i32, max:i32) -> Vec<i32> {
     for _i in 0..len{
         v.push(rng.gen_range(min, max));
     }
-    return v;
+    // Rust returns the last expression in a function, so
+    // this is equivalent to `return v`. 
+    v
 }
 
 #[cfg(test)]
